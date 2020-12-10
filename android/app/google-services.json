@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "151749733936",
+    "firebase_url": "https://geetaxi-33def-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "geetaxi-33def",
+    "storage_bucket": "geetaxi-33def.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:151749733936:android:dfd195afe6126e0a3887f5",
+        "android_client_info": {
+          "package_name": "com.example.cab_rider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "151749733936-tr2qksd26pv7ri7rasb707jblh5d9bpg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_FFj58_p33Oy-PGffn7ACD84BI7HmSkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "151749733936-tr2qksd26pv7ri7rasb707jblh5d9bpg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
