@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:cab_rider/registrationpage.dart';
+import 'file:///C:/FlutterProject/cab_rider/lib/screens/registrationpage.dart';
 import 'package:cab_rider/screens/loginpage.dart';
 import 'package:cab_rider/screens/mainpage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: RegistrationPage.id,
+      initialRoute: MainPage.id,
       routes: {
         RegistrationPage.id: (context) => RegistrationPage(),
         LoginPage.id: (context) => LoginPage(),

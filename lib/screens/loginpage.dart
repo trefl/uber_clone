@@ -1,16 +1,75 @@
 import 'package:cab_rider/brand_colors.dart';
-import 'package:cab_rider/registrationpage.dart';
+import 'file:///C:/FlutterProject/cab_rider/lib/screens/registrationpage.dart';
+import 'package:cab_rider/screens/mainpage.dart';
+import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:cab_rider/widgets/TaxiButton.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
 
   static const String id='login';
 
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void showSnackBar(String title){
+    final snackbar = SnackBar(
+      content: Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 15),),
+    );
+    scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
+
+
+  void login() async {
+
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => ProgressDialog(status: 'Logowanie',),
+    );
+    // ignore: deprecated_member_use
+    final User user = (await _auth.signInWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text,
+    ).catchError((ex){
+
+        //sprawdzanie błędu i jego wyświetlenie
+        Navigator.pop(context);
+        PlatformException thisEx = ex;
+        showSnackBar(thisEx.message);
+
+    })).user;
+
+    if(user != null){
+      //weryfikacja
+      DatabaseReference userRef = FirebaseDatabase.instance.reference().child('user/${user.uid}');
+
+      userRef.once().then((DataSnapshot snapshot)=>{
+        if(snapshot.value != null){
+          Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false),
+        }
+      });
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -40,6 +99,7 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       TextField(
+                        controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Adres email',
@@ -57,6 +117,7 @@ class LoginPage extends StatelessWidget {
                         height: 10,
                       ),
                       TextField(
+                        controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Hasło',
@@ -76,7 +137,25 @@ class LoginPage extends StatelessWidget {
                       TaxiButton(
                         title: 'Zaloguj',
                         color: BrandColors.colorGreen,
-                        onPressed:(){
+                        onPressed:() async {
+                          //Sprawdzanie połączenia
+                          var connectivityResult = await Connectivity().checkConnectivity();
+                          if(connectivityResult != ConnectivityResult.mobile && connectivityResult != ConnectivityResult.wifi ){
+                            showSnackBar('Brak połączenia z internetem');
+                            return;
+                          }
+
+                          if(!emailController.text.contains('@')){
+                            showSnackBar('Niepoprawny adres email');
+                            return;
+                          }
+
+                          if(passwordController.text.length < 8){
+                            showSnackBar('Hasło musi się składać z min. 8 znaków');
+                            return;
+                          }
+                          login();
+
 
                         },
                       ),

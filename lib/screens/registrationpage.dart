@@ -1,6 +1,7 @@
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/screens/loginpage.dart';
 import 'package:cab_rider/screens/mainpage.dart';
+import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:cab_rider/widgets/TaxiButton.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,14 +38,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
   var passwordController = TextEditingController();
 
   Future<void> registerUser() async {
+
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => ProgressDialog(status: 'Rejestrowanie',),
+    );
+
+
     final User user = (await _auth.createUserWithEmailAndPassword(
       email: emailController.text,
       password: passwordController.text,
     ).catchError((ex){
       //sprawdzanie błędu i jego wyświetlenie
+      Navigator.pop(context);
       PlatformException thisEx = ex;
       showSnackBar(thisEx.message);
     })).user;
+
+    Navigator.pop(context);
       //Sprawdzanie czy rejestracja przebiegła pomyślnie
     if(user != null){
       DatabaseReference newUserRef = FirebaseDatabase.instance.reference().child('user/${user.uid}');
@@ -184,6 +196,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         color: BrandColors.colorGreen,
                         onPressed:()async{
 
+                          //Sprawdzanie połączenia
                           var connectivityResult = await Connectivity().checkConnectivity();
                           if(connectivityResult != ConnectivityResult.mobile && connectivityResult != ConnectivityResult.wifi ){
                             showSnackBar('Brak połączenia z internetem');
@@ -204,7 +217,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             return;
                           }
                           if(passwordController.text.length < 8){
-                            showSnackBar('Hasło musi się składać z 8 znaków');
+                            showSnackBar('Hasło musi się składać z min. 8 znaków');
                             return;
                           }
 
