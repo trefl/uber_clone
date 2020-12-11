@@ -33,6 +33,11 @@ dependencies:
   firebase_database: ^4.4.0
   connectivity: ^2.0.2
   google_maps_flutter: ^1.0.6
+  outline_material_icons: ^0.1.1
+  #geolocator: ^6.1.13
+  geolocator: ^5.3.1
+  http: ^0.12.2
+  provider: ^4.3.2+3
 
 dev_dependencies:
   flutter_test:
