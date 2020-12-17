@@ -6,6 +6,7 @@ import 'package:cab_rider/helpers/helpermethods.dart';
 import 'package:cab_rider/screens/searchpage.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/BrandDivier.dart';
+import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -204,10 +205,14 @@ class _MainPageState extends State<MainPage> {
                     Text('Dokąd chcesz jechać?', style: TextStyle(fontSize: 18, fontFamily: 'Brand-bold'),),
                     SizedBox(height: 20,),
                     GestureDetector(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(
+                      onTap: () async {
+                        var response = await Navigator.push(context, MaterialPageRoute(
                             builder: (context) => SearchPage()
                         ));
+
+                        if(response == 'getDirection'){
+                          await getDirection();
+                        }
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -282,5 +287,27 @@ class _MainPageState extends State<MainPage> {
         ]
       )
     );
+  }
+
+  Future<void>getDirection() async {
+    var pickup = Provider.of<AppData>(context, listen: false).pickupAddress;
+    var destination = Provider.of<AppData>(context, listen: false).destinationAddress;
+
+    var pickLatLng = LatLng(pickup.latitude, pickup.longitude);
+    var destinationLatLng = LatLng(destination.latitude, destination.longitude);
+
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => ProgressDialog(status: "Proszę czekać...",)
+    );
+
+
+
+    var thisDetails = await HelperMethods.getDirectionDetails(pickLatLng, destinationLatLng);
+
+    Navigator.pop(context);
+    print(thisDetails.encodePoints);
+
   }
 }
