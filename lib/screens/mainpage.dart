@@ -7,9 +7,11 @@ import 'package:cab_rider/screens/searchpage.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/BrandDivier.dart';
 import 'package:cab_rider/widgets/ProgressDialog.dart';
+import 'package:cab_rider/widgets/TaxiButton.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
@@ -295,6 +297,90 @@ class _MainPageState extends State<MainPage> {
               )
             ),
           ),
+
+          //Szczegóły jazdy
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 15.0,
+                    spreadRadius: 0.5,
+                    offset: Offset(
+                      0.7,
+                      0.7,
+                    ),
+                  )
+                ],
+              ),
+              height: 260,
+              child: Padding(
+                padding:  EdgeInsets.symmetric(vertical: 18),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      color: BrandColors.colorAccent1,
+                      child: Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: <Widget>[
+                            Image.asset('images/taxi.png', height: 70, width: 70,),
+                            SizedBox(width: 16,),
+                            Column(
+                              children: <Widget>[
+                                Text('Taxi', style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),),
+                                Text('14km', style: TextStyle(fontSize: 16, color: BrandColors.colorTextLight),),
+                              ],
+                            ),
+                            Expanded(child: Container()),
+
+                            Text('\$13', style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),),
+
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 22,),
+                    Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(FontAwesomeIcons.moneyBillAlt, size: 18, color: BrandColors.colorTextLight,),
+                          SizedBox(width: 16,),
+                          Text('Gotówka'),
+                          SizedBox(width: 5,),
+                          Icon(Icons.keyboard_arrow_down, color: BrandColors.colorTextLight, size: 16,),
+
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 22,),
+                    Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: 16),
+                      child: TaxiButton(
+                        title: 'Zamów taxi',
+                        color: BrandColors.colorGreen,
+                        onPressed: (){
+
+                        },
+                      ),
+                    )
+
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+
         ]
       )
     );
