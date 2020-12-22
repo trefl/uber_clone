@@ -58,4 +58,17 @@ class HelperMethods {
     return directionDetails;
 
   }
+  static int estimateFares (DirectionDetails details){
+    //za km = 0.3 PLN
+    //za min 0.2 PLN
+    //Podstawa = 3 PLN
+
+    double baseFare = 3;
+    double distanceFare = (details.distanceValue/1000) * 0.3;
+    double timeFare = (details.durationValue/60) * 0.2;
+
+    double totalFare = baseFare + distanceFare + timeFare;
+
+    return totalFare.truncate();
+  }
 }
