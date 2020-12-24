@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
 
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: MainPage.id,
+        initialRoute: LoginPage.id,
         routes: {
           RegistrationPage.id: (context) => RegistrationPage(),
           LoginPage.id: (context) => LoginPage(),
