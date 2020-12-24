@@ -126,7 +126,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text(
-                              'Kierowca',
+                              'Pasażer',
                               style: TextStyle(
                                   fontSize: 20, fontFamily: 'Brand-Bold'),
                             ),

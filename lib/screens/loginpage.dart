@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 40,
                 ),
                 Text(
-                  'Zaloguj się jako kierowca',
+                  'Zaloguj się jako pasażer',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 25, fontFamily: 'Brand-Bold'),
                 ),
