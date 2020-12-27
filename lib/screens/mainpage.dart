@@ -12,6 +12,7 @@ import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:cab_rider/widgets/TaxiButton.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -62,9 +63,12 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     CameraPosition cp = new CameraPosition(target: pos, zoom: 14);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
 
-    String address =
-        await HelperMethods.findCordinateAddress(position, context);
-    print(address);
+
+    startGeofireListener();
+
+ //   String address =
+   //     await HelperMethods.findCordinateAddress(position, context);
+ //   print(address);
   }
 
   void showDetailSheet() async {
@@ -731,6 +735,45 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       _Circles.add(pickupCircle);
       _Circles.add(destinationCircle);
     });
+  }
+
+  void startGeofireListener(){
+    
+    Geofire.initialize('driversAvailable');
+
+
+
+    Geofire.queryAtLocation(currentPosition.latitude, currentPosition.longitude, 1).listen((map) {
+      print(map);
+      if (map != null) {
+        var callBack = map['callBack'];
+
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+
+        switch (callBack) {
+          case Geofire.onKeyEntered:
+
+            break;
+
+          case Geofire.onKeyExited:
+
+            break;
+
+          case Geofire.onKeyMoved:
+          // Update your key's location
+            break;
+
+          case Geofire.onGeoQueryReady:
+          // All Intial Data is loaded
+            print(map['result']);
+
+            break;
+        }
+      }
+    });
+
+
   }
 
   void createRideRequest() {

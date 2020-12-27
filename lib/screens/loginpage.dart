@@ -1,6 +1,6 @@
 import 'package:cab_rider/brand_colors.dart';
-import 'file:///C:/FlutterProject/cab_rider/lib/screens/registrationpage.dart';
 import 'package:cab_rider/screens/mainpage.dart';
+import 'package:cab_rider/screens/registrationpage.dart';
 import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:cab_rider/widgets/TaxiButton.dart';
 import 'package:connectivity/connectivity.dart';
