@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cab_rider/datamodels/address.dart';
 import 'package:cab_rider/datamodels/directiondetails.dart';
 import 'package:cab_rider/datamodels/user.dart';
@@ -94,5 +96,12 @@ class HelperMethods {
     double totalFare = baseFare + distanceFare + timeFare;
 
     return totalFare.truncate();
+  }
+
+  static double generateRandomNumber(int max){
+    var randomGenerator = Random();
+    int randInt = randomGenerator.nextInt(max);
+
+    return randInt.toDouble();
   }
 }
