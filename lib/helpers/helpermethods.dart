@@ -97,7 +97,6 @@ class HelperMethods {
 
     return totalFare.truncate();
   }
-
   static double generateRandomNumber(int max){
     var randomGenerator = Random();
     int randInt = randomGenerator.nextInt(max);
