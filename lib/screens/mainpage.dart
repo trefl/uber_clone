@@ -684,6 +684,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       _polylines.add(polyline);
     });
     //dopasowywanie polyline
+
     LatLngBounds bounds;
 
     if (pickLatLng.latitude > destinationLatLng.latitude &&
