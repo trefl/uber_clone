@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'file:///C:/FlutterProject/cab_rider/lib/screens/registrationpage.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
+import 'package:cab_rider/globalvariable.dart';
 import 'package:cab_rider/screens/loginpage.dart';
 import 'package:cab_rider/screens/mainpage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +30,8 @@ Future<void> main() async {
       databaseURL: 'https://geetaxi-33def-default-rtdb.europe-west1.firebasedatabase.app',
     ),
   );
+
+  currentFirebaseUser = await FirebaseAuth.instance.currentUser;
   runApp(MyApp());
 }
 
@@ -47,7 +51,7 @@ class MyApp extends StatelessWidget {
 
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: LoginPage.id,
+        initialRoute: (currentFirebaseUser== null) ? LoginPage.id : MainPage.id,
         routes: {
           RegistrationPage.id: (context) => RegistrationPage(),
           LoginPage.id: (context) => LoginPage(),
