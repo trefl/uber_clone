@@ -908,9 +908,30 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     }
     var driver = availableDrivers[0];
 
+    notifyDriver(driver);
+
     availableDrivers.removeAt(0);
 
     print(driver.key);
+
+  }
+
+  void notifyDriver(NearbyDriver driver){
+    DatabaseReference driverTripRef = FirebaseDatabase.instance.reference().child('drivers/${driver.key}/newtrip');
+    driverTripRef.set(rideRef.key);
+
+    DatabaseReference tokenRef = FirebaseDatabase.instance.reference().child('drivers/${driver.key}/token');
+
+    tokenRef.once().then((DataSnapshot snapshot){
+
+      if(snapshot.value != null){
+        String token = snapshot.value.toString();
+        
+        HelperMethods.sendNotification(token, context, rideRef.key);
+
+      }
+
+    });
 
   }
 }

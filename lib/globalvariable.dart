@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
+String serverKey = 'key=AAAAI1T9LjA:APA91bGKy6H9x8bpYIBG0ebbnCMho9NIOoRo9JGdgl0IwxB-qGg2JmDUYhYaAUQpW_Pxprwnj2kA10zYgelPgjHMvhRv-8SDVcXQOBveHI0InuZfuFjNT1e9TKnRe-yBffd59wMJsXiT';
+
 String mapKey = 'AIzaSyA_FFj58_p33Oy-PGffn7ACD84BI7HmSkE';
 
 
