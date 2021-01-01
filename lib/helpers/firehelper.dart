@@ -8,7 +8,12 @@ class FireHelper{
     int index = nearbyDriverList.indexWhere((element) => element.key == key);
     nearbyDriverList.removeAt(index);
 
+    if(nearbyDriverList.length > 0){
+      nearbyDriverList.removeAt(index);
+    }
   }
+
+
 
   static void updateNearbyLocation(NearbyDriver driver){
     int index = nearbyDriverList.indexWhere((element) => element.key == driver.key);

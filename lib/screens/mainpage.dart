@@ -5,11 +5,12 @@ import 'package:cab_rider/datamodels/directiondetails.dart';
 import 'package:cab_rider/datamodels/nearbydriver.dart';
 import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/globalvariable.dart';
-import 'package:cab_rider/helpers/filehelper.dart';
+import 'package:cab_rider/helpers/firehelper.dart';
 import 'package:cab_rider/helpers/helpermethods.dart';
 import 'package:cab_rider/screens/searchpage.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/BrandDivier.dart';
+import 'package:cab_rider/widgets/NoDriverDialog.dart';
 import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:cab_rider/widgets/TaxiButton.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -58,6 +59,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   bool drawerCanOpen = true;
 
   DatabaseReference rideRef;
+
+  List<NearbyDriver> availableDrivers;
 
   bool nearbyDriversKeysLoaded = false;
 
@@ -534,6 +537,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                             color: BrandColors.colorGreen,
                             onPressed: () {
                               showRequestingSheet();
+                              availableDrivers = FireHelper.nearbyDriverList;
+
+                              findDriver();
                             },
                           ),
                         )
@@ -882,5 +888,29 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     });
 
     setupPositionLocator();
+  }
+
+  void noDriverFound(){
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => NoDriverDialog()
+    );
+  }
+
+  void findDriver(){
+
+    if(availableDrivers.length == 0){
+      cancelRequest();
+      resetApp();
+      noDriverFound();
+      return;
+    }
+    var driver = availableDrivers[0];
+
+    availableDrivers.removeAt(0);
+
+    print(driver.key);
+
   }
 }
