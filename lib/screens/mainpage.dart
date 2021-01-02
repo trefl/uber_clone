@@ -7,6 +7,7 @@ import 'package:cab_rider/dataproviders/appdata.dart';
 import 'package:cab_rider/globalvariable.dart';
 import 'package:cab_rider/helpers/firehelper.dart';
 import 'package:cab_rider/helpers/helpermethods.dart';
+import 'package:cab_rider/rideVariables.dart';
 import 'package:cab_rider/screens/searchpage.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/BrandDivier.dart';
@@ -21,7 +22,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
-import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -38,13 +38,14 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   double searchSheetHeight = 300;
   double rideDetailsSheetHeight = 0;
   double requestingSheetHeight = 0;
+  double tripSheetHeight = 0;
 
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
   double mapBottomPadding = 0;
 
   List<LatLng> polylineCoordinates = [];
-  Set<Polyline> _polylines = {};
+  Set<Polyline> _polyLines = {};
   Set<Marker> _Markers = {};
   Set<Circle> _Circles = {};
 
@@ -56,13 +57,18 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   DirectionDetails tripDirectionDetails;
 
+  String appState = 'NORMAL';
+
   bool drawerCanOpen = true;
 
   DatabaseReference rideRef;
 
+  StreamSubscription<Event> rideSubscription;
+
   List<NearbyDriver> availableDrivers;
 
   bool nearbyDriversKeysLoaded = false;
+
 
   void setupPositionLocator() async {
     Position position = await geoLocator.getCurrentPosition(
@@ -97,6 +103,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     });
 
     createRideRequest();
+  }
+
+  showTripSheet(){
+    setState(() {
+
+      requestingSheetHeight = 0;
+      tripSheetHeight = 275;
+      mapBottomPadding = 280;
+
+    });
   }
 
   void createMarker(){
@@ -214,7 +230,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
               myLocationEnabled: true,
               zoomGesturesEnabled: true,
               zoomControlsEnabled: true,
-              polylines: _polylines,
+              polylines: _polyLines,
               markers: _Markers,
               circles: _Circles,
               onMapCreated: (GoogleMapController controller) {
@@ -536,6 +552,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                             title: 'Zamów taxi',
                             color: BrandColors.colorGreen,
                             onPressed: () {
+
+                              setState(() {
+                                appState = 'REQUESTING';
+                              });
+
                               showRequestingSheet();
                               availableDrivers = FireHelper.nearbyDriverList;
 
@@ -550,6 +571,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
               ),
             ),
 
+            ///Request Sheet
             Positioned(
               left: 0,
               right: 0,
@@ -637,7 +659,150 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+            ),
+
+            ///Trip Sheet
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: AnimatedSize(
+                vsync: this,
+                duration: new Duration(milliseconds: 150),
+                curve: Curves.easeIn,
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 15.0,
+                          spreadRadius: 0.5,
+                          offset: Offset(
+                            0.7,
+                            0.7,
+                          ),
+                        )
+                      ]),
+                  height: tripSheetHeight,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+
+                        SizedBox(height: 5,),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(tripStatusDisplay,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 20,),
+
+                        BrandDivider(),
+
+                        SizedBox(height: 20,),
+
+                        Text(driverCarDetails, style: TextStyle(color: BrandColors.colorTextLight),),
+
+                        Text(driverFullName, style: TextStyle(fontSize: 20),),
+
+                        SizedBox(height: 20,),
+
+                        BrandDivider(),
+
+                        SizedBox(height: 20,),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    border: Border.all(width: 1.0, color: BrandColors.colorTextLight),
+                                  ),
+                                  child: Icon(Icons.call),
+                                ),
+
+                                SizedBox(height: 10,),
+
+                                Text('Zadzwoń'),
+
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    border: Border.all(width: 1.0, color: BrandColors.colorTextLight),
+                                  ),
+                                  child: Icon(Icons.list),
+                                ),
+
+                                SizedBox(height: 10,),
+
+                                Text('Szczegóły'),
+
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    border: Border.all(width: 1.0, color: BrandColors.colorTextLight),
+                                  ),
+                                  child: Icon(OMIcons.clear),
+                                ),
+
+                                SizedBox(height: 10,),
+
+                                Text('Anuluj'),
+
+                              ],
+                            ),
+
+
+                          ],
+                        )
+
+
+
+
+
+
+
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             )
+
+
+
           ],
         ));
   }
@@ -675,7 +840,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
     }
-    _polylines.clear();
+    _polyLines.clear();
     setState(() {
       Polyline polyline = Polyline(
         polylineId: PolylineId('polyid'),
@@ -687,7 +852,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         endCap: Cap.roundCap,
         geodesic: true,
       );
-      _polylines.add(polyline);
+      _polyLines.add(polyline);
     });
     //dopasowywanie polyline
 
@@ -868,16 +1033,58 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     };
 
     rideRef.set(rideMap);
+
+    rideSubscription = rideRef.onValue.listen((event) {
+      if(event.snapshot.value == null){
+        return;
+      }
+      //get car details
+      if(event.snapshot.value['car_details'] != null){
+
+        setState(() {
+          driverCarDetails = event.snapshot.value['car_details'].toString();
+
+        });
+      }
+      if(event.snapshot.value['driver_name'] != null){
+
+        setState(() {
+          driverFullName = event.snapshot.value['driver_name'].toString();
+        });
+      }
+      if(event.snapshot.value['driver_phone'] != null){
+
+        setState(() {
+          driverPhoneNumber = event.snapshot.value['driver_phone'].toString();
+        });
+      }
+
+
+
+
+
+      if(event.snapshot.value['status'] != null){
+        status = event.snapshot.value['status'].toString();
+      }
+      if(status == 'accepted'){
+        showTripSheet();
+      }
+    });
+
+
   }
 
   void cancelRequest() {
     rideRef.remove();
+    setState(() {
+      appState = 'NORMAL';
+    });
   }
 
   resetApp() {
     setState(() {
       polylineCoordinates.clear();
-      _polylines.clear();
+      _polyLines.clear();
       _Markers.clear();
       _Circles.clear();
       rideDetailsSheetHeight = 0;
@@ -930,6 +1137,45 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         HelperMethods.sendNotification(token, context, rideRef.key);
 
       }
+      else{
+        return;
+      }
+
+      const oneSecTick = Duration(seconds: 1);
+      
+      var timer = Timer.periodic(oneSecTick, (timer) {
+
+        if(appState != 'REQUESTING'){
+          driverTripRef.set('cancelled');
+          driverTripRef.onDisconnect();
+          timer.cancel();
+          driverRequestTimeout = 30;
+        }
+
+        driverRequestTimeout --;
+
+        driverTripRef.onValue.listen((event) {
+          if(event.snapshot.value.toString() == 'accepted'){
+            driverTripRef.onDisconnect();
+            timer.cancel();
+            driverRequestTimeout = 30;
+          }
+
+        });
+
+
+        if(driverRequestTimeout == 0){
+          driverTripRef.set('timeout');
+          driverTripRef.onDisconnect();
+          driverRequestTimeout = 30;
+          timer.cancel();
+
+          findDriver();
+
+        }
+
+
+      });
 
     });
 
