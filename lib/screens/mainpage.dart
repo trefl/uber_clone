@@ -45,7 +45,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   double mapBottomPadding = 0;
 
   List<LatLng> polylineCoordinates = [];
-  Set<Polyline> _polyLines = {};
+  Set<Polyline> _polylines = {};
   Set<Marker> _Markers = {};
   Set<Circle> _Circles = {};
 
@@ -68,6 +68,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   List<NearbyDriver> availableDrivers;
 
   bool nearbyDriversKeysLoaded = false;
+
+  bool isRequestingLocationDetails = false;
 
 
   void setupPositionLocator() async {
@@ -230,7 +232,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
               myLocationEnabled: true,
               zoomGesturesEnabled: true,
               zoomControlsEnabled: true,
-              polylines: _polyLines,
+              polylines: _polylines,
               markers: _Markers,
               circles: _Circles,
               onMapCreated: (GoogleMapController controller) {
@@ -833,14 +835,14 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     PolylinePoints polylinePoints = PolylinePoints();
     List<PointLatLng> results =
-        polylinePoints.decodePolyline(thisDetails.encodePoints);
+        polylinePoints.decodePolyline(thisDetails.encodedPoints);
     polylineCoordinates.clear();
     if (results.isNotEmpty) {
       results.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
     }
-    _polyLines.clear();
+    _polylines.clear();
     setState(() {
       Polyline polyline = Polyline(
         polylineId: PolylineId('polyid'),
@@ -852,7 +854,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         endCap: Cap.roundCap,
         geodesic: true,
       );
-      _polyLines.add(polyline);
+      _polylines.add(polyline);
     });
     //dopasowywanie polyline
 
@@ -1015,7 +1017,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       'longitude': pickup.longitude.toString(),
     };
 
-    Map destinationpMap = {
+    Map destinationMap = {
       'latitude': destination.latitude.toString(),
       'longitude': destination.longitude.toString(),
     };
@@ -1027,7 +1029,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       'pickup_address': pickup.placeName,
       'destination_address': destination.placeName,
       'location': pickupMap,
-      'destination': destinationpMap,
+      'destination': destinationMap,
       'payment_method': 'card',
       'driver_id': 'waiting',
     };
@@ -1058,6 +1060,19 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           driverPhoneNumber = event.snapshot.value['driver_phone'].toString();
         });
       }
+      //get and use driver location updates
+      if(event.snapshot.value['driver_location'] != null){
+        double driverLat = double.parse(event.snapshot.value['driver_location']['latitude'].toString());
+        double driverLng = double.parse(event.snapshot.value['driver_location']['longitude'].toString());
+
+        LatLng driverLocation = LatLng(driverLat, driverLng);
+
+        if(status == 'accepted'){
+          updateToPickup(driverLocation);
+        }
+
+
+      }
 
 
 
@@ -1073,6 +1088,28 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
 
   }
+  void updateToPickup(LatLng driverLocation) async {
+
+    if(!isRequestingLocationDetails){
+
+      isRequestingLocationDetails = true;
+      var positionLatLng = LatLng(currentPosition.latitude, currentPosition.longitude);
+
+      var thisDetails = await HelperMethods.getDirectionDetails(driverLocation, positionLatLng);
+
+      if(thisDetails == null){
+        return;
+      }
+      setState(() {
+        tripStatusDisplay = 'Kierowca dojedzie za - ${thisDetails.durationText}';
+      });
+
+      isRequestingLocationDetails = false;
+    }
+
+
+
+  }
 
   void cancelRequest() {
     rideRef.remove();
@@ -1084,7 +1121,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   resetApp() {
     setState(() {
       polylineCoordinates.clear();
-      _polyLines.clear();
+      _polylines.clear();
       _Markers.clear();
       _Circles.clear();
       rideDetailsSheetHeight = 0;

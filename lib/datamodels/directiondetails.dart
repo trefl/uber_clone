@@ -3,13 +3,13 @@ class DirectionDetails {
   String durationText;
   int distanceValue;
   int durationValue;
-  String encodePoints;
+  String encodedPoints;
 
   DirectionDetails({
     this.distanceText,
     this.distanceValue,
     this.durationText,
     this.durationValue,
-    this.encodePoints,
+    this.encodedPoints,
   });
 }

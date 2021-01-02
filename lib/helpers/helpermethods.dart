@@ -81,7 +81,7 @@ class HelperMethods {
     directionDetails.distanceText = response['routes'][0]['legs'][0]['distance']['text'];
     directionDetails.distanceValue = response['routes'][0]['legs'][0]['distance']['value'];
 
-    directionDetails.encodePoints = response['routes'][0]['overview_polyline']['points'];
+    directionDetails.encodedPoints = response['routes'][0]['overview_polyline']['points'];
 
     return directionDetails;
 
