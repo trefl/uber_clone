@@ -11,6 +11,7 @@ import 'package:cab_rider/rideVariables.dart';
 import 'package:cab_rider/screens/searchpage.dart';
 import 'package:cab_rider/styles/styles.dart';
 import 'package:cab_rider/widgets/BrandDivier.dart';
+import 'package:cab_rider/widgets/CollectPaymentDialog.dart';
 import 'package:cab_rider/widgets/NoDriverDialog.dart';
 import 'package:cab_rider/widgets/ProgressDialog.dart';
 import 'package:cab_rider/widgets/TaxiButton.dart';
@@ -788,23 +789,13 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
 
                           ],
-                        )
-
-
-
-
-
-
-
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-            )
-
-
-
+            ),
           ],
         ));
   }
@@ -931,7 +922,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     Geofire.queryAtLocation(currentPosition.latitude, currentPosition.longitude, 20).listen((map) {
 
-      print(map);
 
       if (map != null) {
         var callBack = map['callBack'];
@@ -1036,7 +1026,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     rideRef.set(rideMap);
 
-    rideSubscription = rideRef.onValue.listen((event) {
+    rideSubscription = rideRef.onValue.listen((event) async {
       if(event.snapshot.value == null){
         return;
       }
@@ -1070,6 +1060,14 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         if(status == 'accepted'){
           updateToPickup(driverLocation);
         }
+        else if(status == 'ontrip'){
+          updateToDestination(driverLocation);
+        }
+        else if(status == 'arrived'){
+          setState(() {
+            tripStatusDisplay = 'Kierowca przyjechał';
+          });
+        }
 
 
       }
@@ -1083,10 +1081,35 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       }
       if(status == 'accepted'){
         showTripSheet();
+        Geofire.stopListener();
+        removeGeofireMarkers();
+      }
+      if(status == 'ended'){
+        if(event.snapshot.value['fares'] != null){
+          int fares = int.parse(event.snapshot.value['fares'].toString());
+
+          var response = await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) => CollectPayment(paymentMethod: 'cash', fares: fares,),
+          );
+          if(response == 'close'){
+            rideRef.onDisconnect();
+            rideRef = null;
+            rideSubscription.cancel();
+            rideSubscription = null;
+            resetApp();
+
+          }
+        }
       }
     });
+  }
 
-
+  void removeGeofireMarkers(){
+    setState(() {
+      _Markers.removeWhere((m) => m.markerId.value.contains('driver'));
+    });
   }
   void updateToPickup(LatLng driverLocation) async {
 
@@ -1101,14 +1124,37 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         return;
       }
       setState(() {
+
         tripStatusDisplay = 'Kierowca dojedzie za - ${thisDetails.durationText}';
       });
 
       isRequestingLocationDetails = false;
     }
+  }
+
+  void updateToDestination(LatLng driverLocation) async {
+
+    if(!isRequestingLocationDetails){
+
+      isRequestingLocationDetails = true;
+
+      var destination = Provider.of<AppData>(context, listen: false).destinationAddress;
+
+      var destinationLatLng = LatLng(destination.latitude, destination.longitude);
 
 
+      var thisDetails = await HelperMethods.getDirectionDetails(driverLocation, destinationLatLng);
 
+      if(thisDetails == null){
+        return;
+      }
+      setState(() {
+
+        tripStatusDisplay = 'Przyjazd na miejsce za ${thisDetails.durationText}';
+      });
+
+      isRequestingLocationDetails = false;
+    }
   }
 
   void cancelRequest() {
@@ -1126,9 +1172,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       _Circles.clear();
       rideDetailsSheetHeight = 0;
       requestingSheetHeight = 0;
+      tripSheetHeight = 0;
       searchSheetHeight = 300;
       mapBottomPadding = 300;
       drawerCanOpen = true;
+
+      status = '';
+      driverFullName = '';
+      driverPhoneNumber = '';
+      driverCarDetails = '';
+      tripStatusDisplay = 'Kierowca jest w drodze';
     });
 
     setupPositionLocator();
