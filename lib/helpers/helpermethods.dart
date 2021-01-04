@@ -25,8 +25,6 @@ class HelperMethods {
     userRef.once().then((DataSnapshot snapshot){
       if(snapshot.value != null){
         currentUserInfo = UserModel.fromSnapshot(snapshot);
-        print('------------------------------------------------------------------------------------------------------------');
-        print('my name is ${currentUserInfo.fullName}');
 
       }
     }
@@ -37,31 +35,35 @@ class HelperMethods {
 
 
 
+
   static Future<String> findCordinateAddress(Position position, context) async {
+
     String placeAddress = '';
 
     var connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult != ConnectivityResult.mobile &&
-        connectivityResult != ConnectivityResult.wifi) {
+    if(connectivityResult != ConnectivityResult.mobile && connectivityResult != ConnectivityResult.wifi){
       return placeAddress;
     }
-    String url =
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${mapKey}';
+
+    String url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$mapKey';
 
     var response = await RequestHelper.getRequest(url);
 
-    if (response != 'failed') {
+    if(response != 'failed'){
       placeAddress = response['results'][0]['formatted_address'];
 
       Address pickupAddress = new Address();
+
       pickupAddress.longitude = position.longitude;
       pickupAddress.latitude = position.latitude;
       pickupAddress.placeName = placeAddress;
 
-      Provider.of<AppData>(context, listen: false)
-          .updatePickupAddress(pickupAddress);
+      Provider.of<AppData>(context, listen: false).updatePickupAddress(pickupAddress);
+
     }
+
     return placeAddress;
+
   }
 
   static Future<DirectionDetails> getDirectionDetails(LatLng startPosition, LatLng endPosition) async {
@@ -70,9 +72,10 @@ class HelperMethods {
 
     var response = await RequestHelper.getRequest(url);
 
-    if (response == 'failed') {
+    if(response == 'failed'){
       return null;
     }
+
     DirectionDetails directionDetails = DirectionDetails();
 
     directionDetails.durationText = response['routes'][0]['legs'][0]['duration']['text'];
@@ -84,22 +87,24 @@ class HelperMethods {
     directionDetails.encodedPoints = response['routes'][0]['overview_polyline']['points'];
 
     return directionDetails;
-
   }
+
   static int estimateFares (DirectionDetails details){
-    //za km = 0.3 PLN
-    //za min 0.2 PLN
-    //Podstawa = 3 PLN
+    // per km = $0.3,
+    // per minute = $0.2,
+    // base fare = $3,
 
     double baseFare = 3;
     double distanceFare = (details.distanceValue/1000) * 0.3;
-    double timeFare = (details.durationValue/60) * 0.2;
+    double timeFare = (details.durationValue / 60) * 0.2;
 
     double totalFare = baseFare + distanceFare + timeFare;
 
     return totalFare.truncate();
   }
+
   static double generateRandomNumber(int max){
+
     var randomGenerator = Random();
     int randInt = randomGenerator.nextInt(max);
 
@@ -108,7 +113,7 @@ class HelperMethods {
 
   static sendNotification(String token, context, String ride_id) async {
 
-    var destination = Provider.of<AppData>(context, listen: false). destinationAddress;
+    var destination = Provider.of<AppData>(context, listen: false).destinationAddress;
 
     Map<String, String> headerMap = {
       'Content-Type': 'application/json',
@@ -116,32 +121,32 @@ class HelperMethods {
     };
 
     Map notificationMap = {
-      'title': ' Zapytanie o przejazd',
-      'body': 'Destination, ${destination.placeName}',
+      'title': 'NEW TRIP REQUEST',
+      'body': 'Destination, ${destination.placeName}'
     };
 
     Map dataMap = {
       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
       'id': '1',
       'status': 'done',
-      'ride_id': ride_id,
+      'ride_id' : ride_id,
     };
 
     Map bodyMap = {
       'notification': notificationMap,
       'data': dataMap,
       'priority': 'high',
-      'to': token,
+      'to': token
     };
+
     var response = await http.post(
-      'https://fcm.googleapis.com/fcm/send',
-      headers: headerMap,
-      body: jsonEncode(bodyMap),
+        'https://fcm.googleapis.com/fcm/send',
+        headers: headerMap,
+        body: jsonEncode(bodyMap)
     );
 
     print(response.body);
 
-
-
   }
+
 }

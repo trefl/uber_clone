@@ -27,6 +27,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
+
 class MainPage extends StatefulWidget {
   static const String id = 'mainpage';
 
@@ -312,7 +313,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         ]),
                     child: Padding(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                      EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -703,8 +704,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(tripStatusDisplay,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
                             ),
                           ],
                         ),
@@ -812,11 +813,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) => ProgressDialog(
-              status: "Proszę czekać...",
-            ));
+          status: "Proszę czekać...",
+        ));
 
     var thisDetails =
-        await HelperMethods.getDirectionDetails(pickLatLng, destinationLatLng);
+    await HelperMethods.getDirectionDetails(pickLatLng, destinationLatLng);
 
     setState(() {
       tripDirectionDetails = thisDetails;
@@ -826,7 +827,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     PolylinePoints polylinePoints = PolylinePoints();
     List<PointLatLng> results =
-        polylinePoints.decodePolyline(thisDetails.encodedPoints);
+    polylinePoints.decodePolyline(thisDetails.encodedPoints);
     polylineCoordinates.clear();
     if (results.isNotEmpty) {
       results.forEach((PointLatLng point) {
@@ -884,7 +885,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       position: destinationLatLng,
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       infoWindow:
-          InfoWindow(title: destination.placeName, snippet: 'Destination'),
+      InfoWindow(title: destination.placeName, snippet: 'Destination'),
     );
 
     setState(() {
@@ -917,7 +918,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   }
 
   void startGeofireListener() {
-    
+
     Geofire.initialize('driversAvailable');
 
     Geofire.queryAtLocation(currentPosition.latitude, currentPosition.longitude, 20).listen((map) {
@@ -1189,9 +1190,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   void noDriverFound(){
     showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => NoDriverDialog()
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => NoDriverDialog()
     );
   }
 
@@ -1223,7 +1224,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
       if(snapshot.value != null){
         String token = snapshot.value.toString();
-        
+
         HelperMethods.sendNotification(token, context, rideRef.key);
 
       }
@@ -1232,7 +1233,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       }
 
       const oneSecTick = Duration(seconds: 1);
-      
+
       var timer = Timer.periodic(oneSecTick, (timer) {
 
         if(appState != 'REQUESTING'){

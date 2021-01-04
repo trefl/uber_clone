@@ -32,7 +32,7 @@ class CollectPayment extends StatelessWidget {
 
             SizedBox(height: 20,),
 
-            Text('${paymentMethod.toUpperCase()} PŁATNOŚĆ'),
+            Text('PŁATNOŚĆ GOTÓWKĄ'),
 
             SizedBox(height: 20,),
 
@@ -46,7 +46,7 @@ class CollectPayment extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Powyższa kwota to łączna opłata za przejazd pasażerem', textAlign: TextAlign.center,),
+              child: Text('Powyższa kwota to łączna opłata za przejazd pasażera', textAlign: TextAlign.center,),
             ),
 
             SizedBox(height: 30,),
